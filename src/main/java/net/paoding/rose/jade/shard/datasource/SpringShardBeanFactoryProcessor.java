@@ -6,6 +6,8 @@ import net.paoding.rose.jade.shard.io.XmlRuleParser;
 import net.paoding.rose.jade.shard.rule.Rule;
 import net.paoding.rose.jade.shard.rule.metas.RuleMeta;
 import net.paoding.rose.jade.shard.rule.metas.RuleMetaMap;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
@@ -26,16 +28,22 @@ public class SpringShardBeanFactoryProcessor implements BeanFactoryPostProcessor
 
     private static final String ruleLocation = "jade.shard.rule.location";
 
+    private static Log log = LogFactory.getLog(SpringShardBeanFactoryProcessor.class);
+
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         String springFlag = System.getProperty("jade.context.spring");
         if(springFlag != null && springFlag.length()>0){
             return;
         }
         List<RuleMeta> metas = this.getRuleMetas();
-        this.doPostProcessBeanFactory(metas,beanFactory);
+        this.doPostProcessBeanFactory(metas, beanFactory);
     }
 
     private void doPostProcessBeanFactory(List<RuleMeta> ruleMetas,ConfigurableListableBeanFactory beanFactory){
+        if(ruleMetas == null || ruleMetas.size() == 0){
+            log.info("no rule exist");
+            return;
+        }
         Map<String,List<RuleMeta>> ruleMap = new HashMap<String, List<RuleMeta>>();
         Map<String,List<Object>> dataSourceMap = new HashMap<String, List<Object>>();
         for(RuleMeta meta:ruleMetas){
@@ -126,7 +134,7 @@ public class SpringShardBeanFactoryProcessor implements BeanFactoryPostProcessor
             XmlRuleParser parser = new XmlRuleParser();
             return parser.parse(doc);
         } catch (DocumentException e) {
-
+            throw new RuntimeException("failed to read xml file, location:"+ruleLoc);
         }finally {
             if(is != null){
                 try {
@@ -136,7 +144,6 @@ public class SpringShardBeanFactoryProcessor implements BeanFactoryPostProcessor
                 }
             }
         }
-        return null;
     }
 
 }
