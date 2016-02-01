@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules>
+    <rule database="d1" catalog="user" type="range" max="3" min="0">
+        <table name="user_info" type="mod" max="6"/>
+    </rule>
+    <rule database="d2" catalog="user" type="range" max="6" min="3">
+        <table name="user_info" type="mod" max="6"/>
+    </rule>
+</rules>
